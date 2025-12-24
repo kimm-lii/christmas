@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>飘雪圣诞树下的音乐派对</title>
+<title>圣诞树</title>
 <style>
   body {
     margin: 0;
@@ -26,10 +26,7 @@
     position: relative;
     z-index: 1;
   }
-  .tree-level {
-    display: flex;
-    justify-content: center;
-  }
+  .tree-level { display: flex; justify-content: center; }
   .snow {
     color: #97EEEE;
     position: absolute;
@@ -40,277 +37,121 @@
     top: -20px;
   }
   @keyframes snowfall {
-    0% {
-      transform: translateX(0);
-      opacity: 0.9;
-    }
-    50% {
-      transform: translateX(calc(Math.random() * 40px - 20px));
-      opacity: 0.8;
-    }
-    100% {
-      transform: translateX(calc(Math.random() * 60px - 30px));
-      top: 100vh;
-      opacity: 0;
-    }
+    0% { transform: translateX(0); opacity: 0.9; }
+    50% { transform: translateX(calc(var(--rand-x,0) * 1px)); opacity: 0.8; }
+    100% { transform: translateX(calc(var(--rand-x,0) * 1px)); top: 100vh; opacity: 0; }
   }
-  .star {
-    color: #FFD700;
-    text-shadow: 0 0 15px #FFD700;
-    font-size: 20px;
-  }
-  .light-red {
-    color: #FF4136;
-    text-shadow: 0 0 10px #FF4136;
-  }
-  .light-green {
-    color: #2ECC40;
-    text-shadow: 0 0 10px #2ECC40;
-  }
-  .light-yellow {
-    color: #FFDC00;
-    text-shadow: 0 0 10px #FFDC00;
-  }
-  .light-purple {
-    color: #B10DC9;
-    text-shadow: 0 0 10px #B10DC9;
-  }
-  .tree-green {
-    color: #00FF00;
-    text-shadow: 0 0 8px #00FF00;
-  }
-  .trunk {
-    color: #D4A017;
-    text-shadow: 0 0 8px #D4A017;
-  }
-  /* 音乐控制区样式 */
-  #music-control {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    z-index: 2;
-  }
-  #music-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #FFD700;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 0 10px #FFD700;
-  }
-  #volume-slider {
-    width: 80px;
-    background: #333;
-    height: 6px;
-    border-radius: 3px;
-    outline: none;
-  }
-  #volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: #FFD700;
-    cursor: pointer;
-    box-shadow: 0 0 5px #FFD700;
-  }
-  /* 上传音乐按钮 */
-  #upload-btn {
-    background: #333;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    border: 1px solid #FFD700;
-  }
-  #upload-btn:hover {
-    background: #555;
-  }
-  #file-input {
-    display: none;
-  }
-  /* 提示文字 */
-  #tips {
-    position: absolute;
-    bottom: 20px;
-    text-align: center;
-    font-size: 14px;
-    opacity: 0.8;
-    text-shadow: 0 0 5px #fff;
-  }
+  .star { color: #FFD700; text-shadow: 0 0 15px #FFD700; font-size: 20px; }
+  .light-red { color: #FF4136; text-shadow: 0 0 10px #FF4136; }
+  .light-green { color: #2ECC40; text-shadow: 0 0 10px #2ECC40; }
+  .light-yellow { color: #FFDC00; text-shadow: 0 0 10px #FFDC00; }
+  .light-purple { color: #B10DC9; text-shadow: 0 0 10px #B10DC9; }
+  .tree-green { color: #00FF00; text-shadow: 0 0 8px #00FF00; }
+  .trunk { color: #D4A017; text-shadow: 0 0 8px #D4A017; }
+  #tips { position:absolute; bottom:10px; font-size:14px; opacity:0.8; text-shadow:0 0 5px #fff; }
 </style>
 </head>
 <body>
 <div id="tree-container"></div>
 <div id="snow-container"></div>
-<!-- 音乐控制区 -->
-<div id="music-control">
-  <div id="music-btn">🎵</div>
-  <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.7">
-  <label for="file-input" id="upload-btn">选择本地圣诞音乐</label>
-  <input type="file" id="file-input" accept="audio/*">
-</div>
-<!-- 提示文字 -->
-<div id="tips">
-  步骤：1. 点击「选择本地圣诞音乐」上传音乐文件 2. 点击音乐按钮播放
-</div>
+<div id="tips">点击页面开始音乐 🎵</div>
 
-<audio id="christmas-music" loop>
-  您的浏览器不支持音频播放
-
+<!-- 自动播放音乐 -->
+<audio id="christmas-music" src="1.mp3" loop></audio>
 
 <script>
-  // 参数配置
   const HEIGHT = 14;
   const WIDTH = 2 * HEIGHT + 9;
   const SPEED = 150;
-  const LIGHTS = ["light-red", "light-green", "light-yellow", "light-purple"];
+  const LIGHTS = ["light-red","light-green","light-yellow","light-purple"];
   const GREEN = "tree-green";
   const SNOW = "snow";
   const STAR = "star";
   const SNOW_DENSITY = 1.2;
   const SNOW_MAX_COUNT = 150;
-  const SNOW_SPEED_RANGE = [1.5, 4];
+  const SNOW_SPEED_RANGE = [1.5,4];
 
   const treeContainer = document.getElementById('tree-container');
   const snowContainer = document.getElementById('snow-container');
   const music = document.getElementById('christmas-music');
-  const musicBtn = document.getElementById('music-btn');
-  const volumeSlider = document.getElementById('volume-slider');
-  const uploadBtn = document.getElementById('upload-btn');
-  const fileInput = document.getElementById('file-input');
   const tips = document.getElementById('tips');
+
   let isPlaying = false;
-  let hasUploaded = false;
-
-  // 音量调节
-  volumeSlider.addEventListener('input', () => {
-    music.volume = volumeSlider.value;
-  });
-
-  // 选择本地音乐文件
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const fileURL = URL.createObjectURL(file);
-      music.src = fileURL;
-      hasUploaded = true;
-      tips.textContent = "音乐已上传！点击音乐按钮开始播放～";
-    }
-  });
-
-  // 播放/暂停控制
-  musicBtn.addEventListener('click', () => {
-    if (!hasUploaded) {
-      tips.textContent = "先上传本地音乐文件再播放哦～";
-      return;
-    }
-
-    if (isPlaying) {
-      music.pause();
-      musicBtn.textContent = "🎵";
-    } else {
-      music.play().then(() => {
-        isPlaying = true;
-        musicBtn.textContent = "⏸";
-        tips.textContent = "圣诞快乐呀～ 点击按钮可以暂停/播放";
-      }).catch(err => {
-        tips.textContent = "点击页面任意位置再试一次～";
-        // 点击页面触发播放
-        document.body.addEventListener('click', () => {
-          music.play();
-          isPlaying = true;
-          musicBtn.textContent = "⏸";
-          tips.textContent = "圣诞快乐呀～ 点击按钮可以暂停/播放";
-        }, { once: true });
-      });
-    }
-    isPlaying = !isPlaying;
-  });
-
-  function clearTree() {
-    treeContainer.innerHTML = '';
-  }
 
   function createSnowflake() {
     if (snowContainer.children.length >= SNOW_MAX_COUNT) return;
-
     const snowflake = document.createElement('span');
     snowflake.className = SNOW;
     snowflake.textContent = Math.random() > 0.5 ? "❄" : "❅";
-    
-    snowflake.style.left = `${Math.random() * 100}vw`;
-    const size = Math.random() * 10 + 8;
+    const randX = Math.random()*60-30;
+    snowflake.style.left = `${Math.random()*100}vw`;
+    snowflake.style.setProperty('--rand-x', randX);
+    const size = Math.random()*10+8;
     snowflake.style.fontSize = `${size}px`;
-    const duration = Math.random() * (SNOW_SPEED_RANGE[1] - SNOW_SPEED_RANGE[0]) + SNOW_SPEED_RANGE[0];
+    const duration = Math.random()*(SNOW_SPEED_RANGE[1]-SNOW_SPEED_RANGE[0])+SNOW_SPEED_RANGE[0];
     snowflake.style.animationDuration = `${duration}s`;
-    snowflake.style.opacity = Math.random() * 0.6 + 0.4;
-
+    snowflake.style.opacity = Math.random()*0.6+0.4;
     snowContainer.appendChild(snowflake);
-
-    setTimeout(() => {
-      snowflake.remove();
-    }, duration * 1000 + 1000);
+    setTimeout(()=>snowflake.remove(), duration*1000+1000);
   }
+
+  function clearTree() { treeContainer.innerHTML=''; }
 
   function drawTree() {
     clearTree();
-    let canvas = Array(HEIGHT + 6).fill(null).map(() => Array(WIDTH).fill(" "));
-
-    canvas[1][Math.floor(WIDTH / 2)] = `<span class="${STAR}">★</span>`;
-
-    for (let i = 0; i < HEIGHT; i++) {
-      for (let j = 0; j < 2 * i + 1; j++) {
-        let x = Math.floor(WIDTH / 2) - i + j;
-        let y = i + 2;
-        if (Math.random() < 0.3) {
-          canvas[y][x] = `<span class="${LIGHTS[Math.floor(Math.random() * LIGHTS.length)]}">●</span>`;
+    let canvasArr = Array(HEIGHT+6).fill(null).map(()=>Array(WIDTH).fill(" "));
+    canvasArr[1][Math.floor(WIDTH/2)] = `<span class="${STAR}">★</span>`;
+    for(let i=0;i<HEIGHT;i++){
+      for(let j=0;j<2*i+1;j++){
+        let x=Math.floor(WIDTH/2)-i+j;
+        let y=i+2;
+        if(Math.random()<0.3){
+          canvasArr[y][x]=`<span class="${LIGHTS[Math.floor(Math.random()*LIGHTS.length)]}">●</span>`;
         } else {
-          canvas[y][x] = `<span class="${GREEN}">*</span>`;
+          canvasArr[y][x]=`<span class="${GREEN}">*</span>`;
         }
       }
     }
-
-    for (let i = 0; i < 3; i++) {
-      canvas[HEIGHT + 2 + i][Math.floor(WIDTH / 2)] = `<span class="trunk">|</span>`;
+    for(let i=0;i<3;i++){
+      canvasArr[HEIGHT+2+i][Math.floor(WIDTH/2)] = `<span class="trunk">|</span>`;
     }
-
-    canvas.forEach(row => {
-      const treeLevel = document.createElement('div');
-      treeLevel.className = 'tree-level';
-      row.forEach(cell => {
-        const span = document.createElement('span');
-        span.innerHTML = cell;
+    canvasArr.forEach(row=>{
+      const treeLevel=document.createElement('div');
+      treeLevel.className='tree-level';
+      row.forEach(cell=>{
+        const span=document.createElement('span');
+        span.innerHTML=cell;
         treeLevel.appendChild(span);
       });
       treeContainer.appendChild(treeLevel);
     });
-
-    const merryChristmas = document.createElement('div');
-    merryChristmas.innerHTML = "🎄🎅 메리 크리스마스! 🎁";
-    merryChristmas.style.marginTop = "10px";
-    merryChristmas.style.textShadow = "0 0 10px #FFD700";
-    merryChristmas.style.fontSize = "16px";
+    const merryChristmas=document.createElement('div');
+    merryChristmas.innerHTML="🎄🎅 메리 크리스마스! 🎁";
+    merryChristmas.style.marginTop="10px";
+    merryChristmas.style.textShadow="0 0 10px #FFD700";
+    merryChristmas.style.fontSize="16px";
     treeContainer.appendChild(merryChristmas);
   }
 
   function mainLoop() {
-    for (let i = 0; i < Math.ceil(SNOW_DENSITY); i++) {
-      createSnowflake();
-    }
+    for(let i=0;i<Math.ceil(SNOW_DENSITY);i++) createSnowflake();
     drawTree();
     setTimeout(mainLoop, SPEED);
   }
 
   mainLoop();
+
+  // ===== 点击播放音乐 =====
+  document.body.addEventListener('click', ()=>{
+    if(!isPlaying){
+      music.play().then(()=>{
+        isPlaying = true;
+        tips.textContent="🎵 音乐播放中 🎵";
+      }).catch(()=>{
+        tips.textContent="请再次点击页面以允许播放音乐 🎵";
+      });
+    }
+  }, { once: true });
 </script>
 </body>
 </html>
